@@ -1,7 +1,10 @@
-﻿namespace Resturant_api.Model.DTO
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Resturant_api.Model.DTO
 {
     public class UpdateMenuRequestDto
     {
+        [MinLength(3, ErrorMessage = "Food name has been minimum of 3 characters")]
         public required string FoodName { get; set; }
         public required string Category { get; set; }
         public required string FoodType { get; set; }

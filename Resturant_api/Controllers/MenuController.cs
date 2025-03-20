@@ -68,15 +68,21 @@ namespace Resturant_api.Controllers
         {
             try
             {
-                //map dto to domain model
-                var menuDomaiModel = _mapper.Map<Menu>(menuRequestDto);
-                menuDomaiModel = await _menuRepository.CreateAsnyc(menuDomaiModel);
+                if (ModelState.IsValid)
+                {
+                    //map dto to domain model
+                    var menuDomaiModel = _mapper.Map<Menu>(menuRequestDto);
+                    menuDomaiModel = await _menuRepository.CreateAsnyc(menuDomaiModel);
 
-                //Map domain model to dto
-                var menuDto = _mapper.Map<MenuDto>(menuDomaiModel);
+                    //Map domain model to dto
+                    var menuDto = _mapper.Map<MenuDto>(menuDomaiModel);
 
-                return CreatedAtAction(nameof(GetByMenuId), new { MenuId = menuDto.MenuId }, menuDto);
+                    return CreatedAtAction(nameof(GetByMenuId), new { MenuId = menuDto.MenuId }, menuDto);
 
+                }
+                else { 
+                    return BadRequest();
+                }
             }
             catch (Exception)
             {
@@ -92,24 +98,29 @@ namespace Resturant_api.Controllers
         {
             try
             {
-                var MenuDomainModel = _mapper.Map<Menu>(updateMenuRequestDto);
-                MenuDomainModel = await _menuRepository.UpdateAsnyc(MenuId, MenuDomainModel);
-
-                if (MenuDomainModel == null)
+                if (ModelState.IsValid)
                 {
-                    return NotFound();
+                    var MenuDomainModel = _mapper.Map<Menu>(updateMenuRequestDto);
+                    MenuDomainModel = await _menuRepository.UpdateAsnyc(MenuId, MenuDomainModel);
+
+                    if (MenuDomainModel == null)
+                    {
+                        return NotFound();
+                    }
+
+                    //Convert Domain To Dto
+                    var menuDtos = _mapper.Map<MenuDto>(MenuDomainModel);
+
+                    return Ok(menuDtos);
                 }
-
-                //Convert Domain To Dto
-                var menuDtos = _mapper.Map<MenuDto>(MenuDomainModel);
-
-                return Ok(menuDtos);
-
+                else
+                {
+                    return BadRequest();
+                }
             }
             catch (Exception)
             {
-
-                throw;
+               throw;
             }
         }
 
@@ -123,8 +134,7 @@ namespace Resturant_api.Controllers
             {
                 return NotFound();
             }
-            var MenusDto = _mapper.Map<List<MenuDto>>(menuDomainModel);
-            return Ok(MenusDto);
+            return Ok();
         }
     }
 }
