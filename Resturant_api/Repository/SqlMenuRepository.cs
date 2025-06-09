@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using System.Reflection.Metadata.Ecma335;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Resturant_api.Data;
 using Resturant_api.Model.Domain;
@@ -14,10 +15,37 @@ namespace Resturant_api.Repository
             this._dbContext = dbContext;
         }
 
-        public async Task<List<Menu>> GetAllAsync()
+        public async Task<List<Menu>> GetAllAsync(string? filterQuery = null)
         {
-            return await _dbContext.Menus.ToListAsync();
+            var ItemList = _dbContext.Menus.AsQueryable();
+            List<Menu> result = new List<Menu>();
+
+            if (!string.IsNullOrWhiteSpace(filterQuery))
+            {
+                filterQuery = filterQuery.Trim();
+
+                if (_dbContext.Menus.Any(x => x.FoodName.Contains(filterQuery) && x.FoodType.Contains(filterQuery)))
+                {
+                    result.AddRange(await _dbContext.Menus.Where(x => x.FoodName.Contains(filterQuery) && x.FoodType.Contains(filterQuery)).ToListAsync());
+                }
+                else if (_dbContext.Menus.Any(x => x.Category.Contains(filterQuery)))
+                {
+                    result.AddRange(await _dbContext.Menus.Where(x => x.Category.Contains(filterQuery)).ToListAsync());
+                }
+                else
+                {
+                    result.AddRange(await _dbContext.Menus.Where(x => x.FoodType.Contains(filterQuery)).ToListAsync());
+                }
+            }
+            else
+            {
+                return await ItemList.ToListAsync();
+            }
+            return result;
         }
+
+
+
 
         public async Task<Menu?> GetByMenuIdAsnyc(Guid MenuId)
         {

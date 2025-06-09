@@ -5,7 +5,7 @@ namespace Resturant_api.Data
 {
     public class ResturantDbContext: DbContext
     {
-        public ResturantDbContext(DbContextOptions dbContextOptions): base(dbContextOptions)
+        public ResturantDbContext(DbContextOptions<ResturantDbContext> dbContextOptions): base(dbContextOptions)
         {
                 
         }
