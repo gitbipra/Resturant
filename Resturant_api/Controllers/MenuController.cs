@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ namespace Resturant_api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class MenuController : ControllerBase
     {
         private readonly IMenuRepository _menuRepository;
@@ -25,11 +27,11 @@ namespace Resturant_api.Controllers
 
         //Get All Items
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] string? filterQuery = null)
         {
             try
             {
-                var FoodMenu = await _menuRepository.GetAllAsync();
+                var FoodMenu = await _menuRepository.GetAllAsync(filterQuery);
 
                 var MenusDto = _mapper.Map<List<MenuDto>>(FoodMenu);
 
